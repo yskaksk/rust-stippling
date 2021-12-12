@@ -26,7 +26,8 @@ struct Particle {
 impl Particle {
     fn new(x: f32, y: f32) -> Self {
         Particle {
-            x, y,
+            x,
+            y,
             vx: 0.0,
             vy: 0.0,
         }
@@ -47,7 +48,11 @@ impl Model {
             let y = random_range(-1.0, 1.0);
             points.push(Particle::new(x, y));
         }
-        Model { points, n, image: img}
+        Model {
+            points,
+            n,
+            image: img,
+        }
     }
 }
 
@@ -70,7 +75,8 @@ fn model(app: &App) -> Model {
     let mut img_mat: Array2<f32> = Array2::zeros((w as usize, h as usize));
     let ib = img.to_rgb8();
     for (x, y, p) in ib.enumerate_pixels() {
-        let charge = BLANK_LEVEL - (0.2989 * p[0] as f32 + 0.5870 * p[1] as f32 + 0.1140 * p[2] as f32) / 255.0;
+        let charge = BLANK_LEVEL
+            - (0.2989 * p[0] as f32 + 0.5870 * p[1] as f32 + 0.1140 * p[2] as f32) / 255.0;
         img_mat[[x as usize, y as usize]] = charge;
     }
     Model::init(N_PARTICLE, img_mat)
@@ -86,7 +92,10 @@ fn view(app: &App, model: &Model, frame: Frame) {
     let t = wr.top();
     for p in model.points.iter() {
         draw.ellipse()
-            .x_y(map_range(p.x, -1.0, 1.0, l, r), map_range(p.y, -1.0, 1.0, b, t))
+            .x_y(
+                map_range(p.x, -1.0, 1.0, l, r),
+                map_range(p.y, -1.0, 1.0, b, t),
+            )
             .radius(DOT_SIZE)
             .rgba8(0, 0, 0, 255);
     }
@@ -100,19 +109,21 @@ fn rotate(v: f32) -> f32 {
         v + 2.0
     } else {
         v
-    }
+    };
 }
 
 fn update(app: &App, model: &mut Model, _: Update) {
     let nframe = app.elapsed_frames();
     if nframe < 30 {
-        app.main_window().capture_frame("output/".to_string() + &app.exe_name().unwrap() + "_" + &nframe.to_string() + ".png");
+        app.main_window().capture_frame(
+            "output/".to_string() + &app.exe_name().unwrap() + "_" + &nframe.to_string() + ".png",
+        );
     }
     if nframe == 250 {
         println!("updated 250 times");
     }
     if nframe >= 250 {
-        return
+        return;
     }
     let dt = TIME_DELTA;
     let eps = EPSILON;
@@ -169,9 +180,10 @@ fn update(app: &App, model: &mut Model, _: Update) {
 fn key_pressed(app: &App, _: &mut Model, key: Key) {
     match key {
         Key::S => {
-            app.main_window().capture_frame(app.exe_name().unwrap() + ".png");
+            app.main_window()
+                .capture_frame(app.exe_name().unwrap() + ".png");
             println!("saved!");
-        },
+        }
         Key::Q => app.quit(),
         _ => {}
     }
